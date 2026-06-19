@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026 - Live Match Schedule</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter for premium, ultra-clean UI typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        html {
+            min-height: 100%;
+            background: #000000;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            overflow-x: hidden;
+            position: relative;
+            isolation: isolate;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at center, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.95) 58%, rgba(0, 0, 0, 0.99) 100%),
+                url('https://cineby.io/fifab.jpg') no-repeat center center;
+            background-size: cover;
+            transform: translateZ(0);
+        }
+        body > * {
+            position: relative;
+            z-index: 1;
+        }
+        /* Custom scrollbar matching the premium dark interface */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f1f1f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2e2e2e;
+        }
+        .hero-shell {
+            min-height: calc(100vh - 2rem);
+        }
+        @media (min-width: 768px) {
+            .hero-shell {
+                min-height: calc(100vh - 4rem);
+            }
+        }
+        /* Hidden state for scroll trigger animations */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(26px) scale(0.98);
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* Triggered active state */
+        .reveal-item.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .hover\:scale-102:hover {
+            transform: scale(1.02);
+        }
+        .future-match {
+            position: relative;
+        }
+        .future-match::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: -1.35rem;
+            width: 4px;
+            height: 4px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateX(-50%);
+        }
+        .future-match:first-child::before {
+            display: none;
+        }
+        .hero-score-dash {
+            color: rgba(115, 115, 115, 0.95);
+        }
+        .live-center-badge {
+            min-width: 4.75rem;
+        }
+        .hero-live-score {
+            text-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
+        }
+    </style>
+</head>
+<body class="text-neutral-100 min-h-screen flex flex-col items-center selection:bg-neutral-800 selection:text-white relative p-4 md:p-8 bg-black">
+
+    <!-- MAIN INTERACTIVE WRAPPER -->
+    <div class="w-full max-w-4xl flex flex-col items-center">
+
+        <!-- LOBBY / TIMELINE VIEW (Everything on the main dashboard) -->
+        <div id="main-lobby" class="w-full flex flex-col items-center">
+            
+            <!-- HERO AREA CONTAINER -->
+            <div class="hero-shell flex flex-col justify-between items-center w-full py-6">
+
+                <!-- HEADER UNIT (Tournament Branding & Next Match Tag) -->
+                <div class="flex flex-col items-center text-center select-none">
+                    <!-- FIFA logo blending into background -->
+                    <img src="https://cineby.io/fifawc.webp" alt="FIFA World Cup 2026" class="h-24 md:h-28 object-contain opacity-40 hover:opacity-75 transition-opacity duration-300 drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)]">
+
+                    <div class="mt-8 flex items-center gap-2">
+                        <span id="hero-status-dot" class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                        <span id="hero-status-label" class="text-[10px] font-black tracking-[0.3em] uppercase text-neutral-400">NEXT MATCH</span>
+                    </div>
+                </div>
+
+                <!-- HERO MAIN STAGE CARD -->
+                <div id="hero-match-card" class="w-full flex flex-col items-center text-center my-auto py-8">
+
+                    <!-- MATCHUP CONTAINER -->
+                    <div class="relative flex justify-center items-start w-full max-w-2xl px-4 mb-8">
+                        <!-- Left Side -->
+                        <div class="flex flex-col items-center w-1/2 pr-4 md:pr-8">
+                            <div id="hero-home-flag" class="w-36 md:w-52 aspect-[3/2] shadow-[0_25px_50px_rgba(0,0,0,0.95)] border border-white/10 overflow-hidden flex items-center justify-center transition-transform duration-300 hover:scale-102 bg-black">
+                                <span class="text-neutral-500 font-extrabold text-2xl font-mono">?</span>
+                            </div>
+                            <h2 id="hero-home-name" class="text-base md:text-3xl font-black tracking-wide text-white uppercase select-none leading-none mt-6 md:mt-8 text-center w-full whitespace-nowrap">
+                                ???
+                            </h2>
+                        </div>
+
+                        <!-- Absolute Midpoint VS / Live Score Badge -->
+                        <div id="hero-center-badge" class="absolute left-1/2 top-[48px] md:top-[69px] -translate-x-1/2 -translate-y-1/2 z-10 select-none px-3 py-1">
+                            <span class="text-[11px] font-black tracking-widest text-neutral-500 uppercase">VS</span>
+                        </div>
+
+                        <!-- Right Side -->
+                        <div class="flex flex-col items-center w-1/2 pl-4 md:pl-8">
+                            <div id="hero-away-flag" class="w-36 md:w-52 aspect-[3/2] shadow-[0_25px_50px_rgba(0,0,0,0.95)] border border-white/10 overflow-hidden flex items-center justify-center transition-transform duration-300 hover:scale-102 bg-black">
+                                <span class="text-neutral-500 font-extrabold text-2xl font-mono">?</span>
+                            </div>
+                            <h2 id="hero-away-name" class="text-base md:text-3xl font-black tracking-wide text-white uppercase select-none leading-none mt-6 md:mt-8 text-center w-full whitespace-nowrap">
+                                ???
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- HERO DETAILS -->
+                    <div class="flex flex-col items-center gap-2 mb-6 select-none">
+                        <span id="hero-stage" class="text-[11px] font-extrabold text-red-500/90 uppercase tracking-[0.25em]">FIFA World Cup</span>
+                        <div class="flex items-center gap-4 mt-0.5 text-[11px] md:text-xs text-neutral-500 font-medium">
+                            <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-neutral-600"></i> <span id="hero-date">---</span></span>
+                            <span class="text-neutral-700">•</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-600"></i> <span id="hero-time">---</span></span>
+                            <span class="text-neutral-700">•</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-600"></i> <span id="hero-venue">???</span></span>
+                        </div>
+                    </div>
+
+                    <!-- SPOTLIGHT "WATCH LIVE" INTERACTION HUB -->
+                    <div class="mb-10 flex flex-col items-center">
+                        <button id="hero-watch-btn" class="flex items-center gap-3 bg-white text-black hover:bg-neutral-200 active:scale-95 transition-all duration-300 px-8 py-4 rounded-full font-black text-xs md:text-sm tracking-[0.2em] uppercase shadow-[0_20px_40px_rgba(255,255,255,0.12)] group">
+                            <i data-lucide="play" class="w-4 h-4 fill-black text-black group-hover:scale-110 transition-transform"></i>
+                            Watch Live
+                        </button>
+                    </div>
+
+                    <!-- HERO TIMER -->
+                    <div id="hero-timer" class="flex items-center justify-center gap-4 md:gap-6 select-none">
+                        <!-- Days -->
+                        <div class="flex flex-col items-center w-16">
+                            <span id="days" class="text-4xl md:text-5xl font-black text-white tracking-tight leading-none transition-all duration-300">--</span>
+                            <span class="text-[11px] md:text-xs font-black text-neutral-500 uppercase tracking-widest mt-3">DAYS</span>
+                        </div>
+                        <!-- Colon -->
+                        <div class="flex flex-col gap-1.5 justify-center h-8 px-1 mb-5">
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                        </div>
+                        <!-- Hours -->
+                        <div class="flex flex-col items-center w-16">
+                            <span id="hours" class="text-4xl md:text-5xl font-black text-white tracking-tight leading-none transition-all duration-300">--</span>
+                            <span class="text-[11px] md:text-xs font-black text-neutral-500 uppercase tracking-widest mt-3">HRS</span>
+                        </div>
+                        <!-- Colon -->
+                        <div class="flex flex-col gap-1.5 justify-center h-8 px-1 mb-5">
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                        </div>
+                        <!-- Minutes -->
+                        <div class="flex flex-col items-center w-16">
+                            <span id="minutes" class="text-4xl md:text-5xl font-black text-white tracking-tight leading-none transition-all duration-300">--</span>
+                            <span class="text-[11px] md:text-xs font-black text-neutral-500 uppercase tracking-widest mt-3">MIN</span>
+                        </div>
+                        <!-- Colon -->
+                        <div class="flex flex-col gap-1.5 justify-center h-8 px-1 mb-5">
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                            <div class="w-1.5 h-1.5 bg-neutral-700 rounded-sm"></div>
+                        </div>
+                        <!-- Seconds -->
+                        <div class="flex flex-col items-center w-16">
+                            <span id="seconds" class="text-4xl md:text-5xl font-black text-white tracking-tight leading-none transition-all duration-300">--</span>
+                            <span class="text-[11px] md:text-xs font-black text-neutral-500 uppercase tracking-widest mt-3">SEC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty element to help stretch space on mobile layouts -->
+                <div class="h-4"></div>
+            </div>
+
+            <!-- CHRONOLOGICAL SCROLL TIMELINE FEED -->
+            <div id="match-schedule-list" class="w-full max-w-3xl flex flex-col gap-12 md:gap-14 pt-14 pb-32">
+                <!-- Dynamic elements loaded here, hidden until user scrolls down -->
+            </div>
+
+        </div>
+
+        <!-- LIVE STREAM PLAYING ENGINE VIEW (Initially Hidden) -->
+        <div id="stream-theater" class="w-full hidden flex-col items-center py-6">
+            
+            <!-- CONTROLS HEADER -->
+            <div class="w-full flex justify-between items-center mb-6 px-1">
+                <!-- Premium Rounded-Pill Back Button -->
+                <button id="stream-back-btn" class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-neutral-200 hover:text-white transition-colors py-2 px-5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 select-none">
+                    &lt; Back
+                </button>
+                <!-- Upper Match Title & Pulsing Status indicator -->
+                <div class="flex items-center gap-2 select-none">
+                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                    <span id="stream-match-title" class="text-[10px] md:text-xs font-black tracking-wider text-neutral-300 uppercase">
+                        UNITED STATES VS AUSTRALIA
+                    </span>
+                </div>
+            </div>
+
+            <!-- IMMERSIVE INTERACTIVE STAGE -->
+            <div class="w-full aspect-video bg-neutral-950 rounded-2xl overflow-hidden border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative group">
+                <!-- Custom iframe player window - sandbox explicitly removed -->
+                <iframe id="video-frame" class="w-full h-full" src="about:blank" allow="autoplay; encrypted-media; fullscreen" allowfullscreen frameborder="0"></iframe>
+            </div>
+
+            <!-- STREAM META / STATS BAR BELOW PLAYER -->
+            <div class="w-full flex justify-between items-center mt-5 px-1 relative select-none">
+                
+                <!-- Left Side: Custom Selection Dropdown Trigger -->
+                <div class="relative flex items-center" id="custom-dropdown-container">
+                    <button id="dropdown-trigger" class="flex items-center gap-2 text-left focus:outline-none group py-1.5">
+                        <span id="current-active-selection" class="flex items-center gap-2 select-none">
+                            <!-- Populated dynamically via selectServer -->
+                        </span>
+                        <!-- Animated Chevron Arrow (hardware accelerated transition) -->
+                        <i id="dropdown-chevron" data-lucide="chevron-down" class="w-4 h-4 text-neutral-400 group-hover:text-white transition-transform duration-300"></i>
+                    </button>
+
+                    <!-- Custom Dropdown Options Panel (Aligned Left perfectly beneath the active trigger label) -->
+                    <div id="dropdown-options" class="hidden absolute bottom-full left-0 mb-3 w-[290px] md:w-[340px] bg-neutral-950 border border-white/15 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-xl py-1.5 z-40 max-h-64 overflow-y-auto transition-all duration-150 ease-out transform origin-bottom-left opacity-0 scale-95 translate-y-2">
+                        <!-- Options rows populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Right Side: Green Live Status Dot & Viewer Count -->
+                <div class="flex items-center gap-1.5 text-[11px] md:text-xs text-neutral-500 font-semibold uppercase tracking-wider">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
+                    <span id="stream-viewers-count" class="text-neutral-400 font-bold">514</span>
+                    <span>Viewers</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TIMELINE SCRIPTS & LIVE COUNTDOWN ENGINE -->
+    <script>
+        // Initiate icons without breaking if CDN is slow.
+        if (window.lucide) lucide.createIcons();
+
+        const scheduleContainer = document.getElementById('match-schedule-list');
+        const mainLobby = document.getElementById('main-lobby');
+        const streamTheater = document.getElementById('stream-theater');
+        const videoFrame = document.getElementById('video-frame');
+        const watchLiveBtn = document.getElementById('hero-watch-btn');
+        const streamBackBtn = document.getElementById('stream-back-btn');
+        
+        // Custom dropdown DOM selectors
+        const dropdownContainer = document.getElementById('custom-dropdown-container');
+        const dropdownTrigger = document.getElementById('dropdown-trigger');
+        const dropdownChevron = document.getElementById('dropdown-chevron');
+        const dropdownOptions = document.getElementById('dropdown-options');
+        const currentActiveSelection = document.getElementById('current-active-selection');
+        const streamMatchTitle = document.getElementById('stream-match-title');
+        const streamViewersCount = document.getElementById('stream-viewers-count');
+
+        let matchesData = [];
+        let baseFixtures = [];
+        let heroKickoff = null;
+        let heroMatchId = null;
+        let activeMatchObj = null;
+        let liveRefreshStarted = false;
+
+        const LIVE_REFRESH_MS = 10000;
+        const GROUP_STAGE_FALLBACK_MS = 135 * 60 * 1000;
+        const KNOCKOUT_FALLBACK_MS = 240 * 60 * 1000;
+
+        // Base Embed URLs from embed.st
+        const STREAM_BASE_URL_DELTA = "https://embed.st/embed/delta/live_world-championship-gr-d_usa-australia-live-streaming-1243624131/";
+        const STREAM_BASE_URL_ADMIN = "https://embed.st/embed/admin/ppv-";
+
+        // Mega Server List featuring all international broadcasting alternatives (23 Global Servers)
+        const SERVER_CHANNELS = [
+            { server: "2", lang: "English", channel: "Live Feed 1 (4K)", quality: "4K", viewers: "1,452", type: "delta" },
+            { server: "1", lang: "English", channel: "Live Feed 2 (HD)", quality: "HD", viewers: "840", type: "delta" },
+            { server: "3", lang: "English", channel: "BBC Sport", quality: "1080P", viewers: "612", type: "delta" },
+            { server: "4", lang: "English", channel: "Sky Sports Main", quality: "1080P", viewers: "956", type: "delta" },
+            { server: "5", lang: "English", channel: "TSN Network", quality: "HD", viewers: "412", type: "delta" },
+            { server: "11", lang: "English", channel: "Optus Sport Feed", quality: "1080P", viewers: "512", type: "admin" },
+            { server: "12", lang: "English", channel: "SonyLIV English", quality: "HD", viewers: "815", type: "admin" },
+            { server: "6", lang: "Spanish", channel: "Telemundo Deportes", quality: "4K", viewers: "1,894", type: "admin" },
+            { server: "13", lang: "Spanish", channel: "Vix Premium", quality: "HD", viewers: "1,110", type: "admin" },
+            { server: "14", lang: "Spanish", channel: "RTVE Selección", quality: "1080P", viewers: "460", type: "admin" },
+            { server: "7", lang: "Arabic", channel: "beIN Sports Max 1", quality: "4K", viewers: "3,892", type: "admin" },
+            { server: "15", lang: "Arabic", channel: "beIN Sports Max 2", quality: "HD", viewers: "2,105", type: "admin" },
+            { server: "16", lang: "Arabic", channel: "Alkass Channel", quality: "1080P", viewers: "941", type: "admin" },
+            { server: "8", lang: "French", channel: "TF1 Direct", quality: "1080P", viewers: "1,120", type: "admin" },
+            { server: "17", lang: "French", channel: "M6 France Live", quality: "HD", viewers: "514", type: "admin" },
+            { server: "9", lang: "German", channel: "ZDF Sportstudio", quality: "HD", viewers: "812", type: "admin" },
+            { server: "18", lang: "German", channel: "ARD Sportschau", quality: "1080P", viewers: "642", type: "admin" },
+            { server: "10", lang: "Portuguese", channel: "Sport TV Portugal", quality: "1080P", viewers: "580", type: "admin" },
+            { server: "19", lang: "Portuguese", channel: "Globo Esporte", quality: "4K", viewers: "1,942", type: "admin" },
+            { server: "20", lang: "Italian", channel: "RAI Sport Premium", quality: "1080P", viewers: "712", type: "admin" },
+            { server: "21", lang: "Turkish", channel: "TRT Spor Direct", quality: "HD", viewers: "1,105", type: "admin" },
+            { server: "22", lang: "Japanese", channel: "Abema TV World", quality: "HD", viewers: "1,642", type: "admin" },
+            { server: "23", lang: "Hindi", channel: "Sports18 Live", quality: "1080P", viewers: "914", type: "admin" }
+        ];
+
+        // Comprehensive Mock Match fallback configuration to protect against CORS/offline issues
+        const MOCK_FIXTURES = [
+            {
+                id: "match-spotlight",
+                matchNumber: "1",
+                stage: "Group Stage • Group D",
+                homeTeam: "United States",
+                homeFlag: "us",
+                awayTeam: "Australia",
+                awayFlag: "au",
+                kickoffUTC: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // Started 30 mins ago (Live now!)
+                venue: "Lumen Field",
+                homeScore: 2,
+                awayScore: 1,
+                minute: 35,
+                clockDisplay: "35'",
+                hasRealScore: true,
+                hasRealClock: true,
+                status: "live"
+            },
+            {
+                id: "match-2",
+                matchNumber: "2",
+                stage: "Group Stage • Group A",
+                homeTeam: "Germany",
+                homeFlag: "de",
+                awayTeam: "Ivory Coast",
+                awayFlag: "ci",
+                kickoffUTC: new Date(Date.now() + 2 * 3600 * 1000).toISOString(), // Starts in 2 hours
+                venue: "MetLife Stadium",
+                homeScore: null,
+                awayScore: null,
+                minute: null,
+                clockDisplay: "",
+                hasRealScore: false,
+                hasRealClock: false,
+                status: "scheduled"
+            },
+            {
+                id: "match-3",
+                matchNumber: "3",
+                stage: "Group Stage • Group B",
+                homeTeam: "Argentina",
+                homeFlag: "ar",
+                awayTeam: "France",
+                awayFlag: "fr",
+                kickoffUTC: new Date(Date.now() + 24 * 3600 * 1000).toISOString(), // Starts tomorrow
+                venue: "SoFi Stadium",
+                homeScore: null,
+                awayScore: null,
+                minute: null,
+                clockDisplay: "",
+                hasRealScore: false,
+                hasRealClock: false,
+                status: "scheduled"
+            },
+            {
+                id: "match-4",
+                matchNumber: "4",
+                stage: "Group Stage • Group C",
+                homeTeam: "Brazil",
+                homeFlag: "br",
+                awayTeam: "Japan",
+                awayFlag: "jp",
+                kickoffUTC: new Date(Date.now() + 48 * 3600 * 1000).toISOString(), // Starts in 2 days
+                venue: "Hard Rock Stadium",
+                homeScore: null,
+                awayScore: null,
+                minute: null,
+                clockDisplay: "",
+                hasRealScore: false,
+                hasRealClock: false,
+                status: "scheduled"
+            }
+        ];
+
+        const REAL_SCHEDULE_SOURCES = [
+            {
+                name: 'thestatsapi-fixtures',
+                url: 'https://www.thestatsapi.com/world-cup/data/fixtures.json',
+                parser: parseStatsApiFixtures
+            },
+            {
+                name: 'github-open-json',
+                url: 'https://raw.githubusercontent.com/rezarahiminia/worldcup2026/main/football.matches.json',
+                parser: parseGenericJsonFixtures
+            },
+            {
+                name: 'github-open-csv',
+                url: 'https://raw.githubusercontent.com/rezarahiminia/worldcup2026/main/worldcup2026.games.csv',
+                parser: parseGenericCsvFixtures
+            },
+            {
+                name: 'worldcup26-rest',
+                url: 'https://worldcup26.ir/get/games',
+                parser: parseGenericJsonFixtures
+            }
+        ];
+
+        const LIVE_SCORE_SOURCES = [
+            {
+                name: 'espn-scoreboard',
+                loader: fetchEspnScoreboards
+            },
+            {
+                name: 'worldcup26-live-rest',
+                url: 'https://worldcup26.ir/get/games',
+                parser: parseGenericJsonFixtures
+            },
+            {
+                name: 'thestatsapi-free-fixtures',
+                url: 'https://www.thestatsapi.com/world-cup/data/fixtures.json',
+                parser: parseStatsApiFixtures
+            }
+        ];
+
+        // 3-Letter mapping rules for API inconsistencies (e.g. GER to DE, CIV to CI)
+        const THREE_LETTER_CODES = {
+            'ger': 'de', 'deu': 'de',
+            'civ': 'ci', 'ivc': 'ci',
+            'usa': 'us', 'usa-w': 'us',
+            'arg': 'ar', 'bra': 'br',
+            'fra': 'fr', 'esp': 'es',
+            'eng': 'gb-eng', 'sct': 'gb-sct', 'wls': 'gb-wls',
+            'ned': 'nl', 'nld': 'nl',
+            'cro': 'hr', 'hrv': 'hr',
+            'mex': 'mx', 'can': 'ca',
+            'aus': 'au', 'jpn': 'jp',
+            'kor': 'kr', 'sen': 'sn',
+            'mar': 'ma', 'col': 'co',
+            'egy': 'eg', 'ksa': 'sa', 'sau': 'sa',
+            'uru': 'uy', 'bel': 'be', 'por': 'pt', 'prt': 'pt',
+            'ita': 'it'
+        };
+
+        const COUNTRY_FLAG_CODES = {
+            'algeria': 'dz',
+            'argentina': 'ar',
+            'australia': 'au',
+            'austria': 'at',
+            'belgium': 'be',
+            'bosnia and herzegovina': 'ba',
+            'brazil': 'br',
+            'cabo verde': 'cv',
+            'cape verde': 'cv',
+            'canada': 'ca',
+            'colombia': 'co',
+            'congo dr': 'cd',
+            'dr congo': 'cd',
+            'costa rica': 'cr',
+            'cote d\'ivoire': 'ci',
+            'côte d\'ivoire': 'ci',
+            'ivory coast': 'ci',
+            'croatia': 'hr',
+            'curacao': 'cw',
+            'curaçao': 'cw',
+            'czechia': 'cz',
+            'czech republic': 'cz',
+            'denmark': 'dk',
+            'ecuador': 'ec',
+            'egypt': 'eg',
+            'england': 'gb-eng',
+            'france': 'fr',
+            'germany': 'de',
+            'ghana': 'gh',
+            'haiti': 'ht',
+            'ir iran': 'ir',
+            'iran': 'ir',
+            'iraq': 'iq',
+            'japan': 'jp',
+            'jordan': 'jo',
+            'korea republic': 'kr',
+            'south korea': 'kr',
+            'mexico': 'mx',
+            'morocco': 'ma',
+            'netherlands': 'nl',
+            'new zealand': 'nz',
+            'norway': 'no',
+            'panama': 'pa',
+            'paraguay': 'py',
+            'poland': 'pl',
+            'portugal': 'pt',
+            'qatar': 'qa',
+            'saudi arabia': 'sa',
+            'scotland': 'gb-sct',
+            'senegal': 'sn',
+            'south africa': 'za',
+            'spain': 'es',
+            'sweden': 'se',
+            'switzerland': 'ch',
+            'tunisia': 'tn',
+            'turkiye': 'tr',
+            'türkiye': 'tr',
+            'turkey': 'tr',
+            'united states': 'us',
+            'usa': 'us',
+            'united states of america': 'us',
+            'uruguay': 'uy',
+            'uzbekistan': 'uz'
+        };
+
+        function getCleanString(value) {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') {
+                return getCleanString(value.name || value.name_en || value.country || value.title || value.full_name || value.short_name || value.en);
+            }
+            return String(value).replace(/\s+/g, ' ').trim();
+        }
+
+        function getJsonPayload(payload) {
+            if (typeof payload !== 'string') return payload;
+            const cleaned = payload.trim();
+            if (!cleaned) return {};
+            try {
+                return JSON.parse(cleaned);
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function getClockDisplay(value) {
+            const raw = getCleanString(value);
+            if (!raw) return '';
+            const upper = raw.toUpperCase();
+            if (/^(HT|HALF\s*-?\s*TIME|HALFTIME)$/.test(upper)) return 'HT';
+            if (/^(FT|FULL\s*-?\s*TIME|FULLTIME|FINAL)$/.test(upper)) return 'FT';
+            const stoppage = raw.match(/(\d{1,3})\s*(?:'|’)?\s*\+\s*(\d{1,2})/);
+            if (stoppage) return `${Number(stoppage[1])}+${Number(stoppage[2])}'`;
+            const minute = raw.match(/(\d{1,3})/);
+            if (minute) return `${Number(minute[1])}'`;
+            return '';
+        }
+
+        function isUnknownTeam(name) {
+            const value = getCleanString(name).toLowerCase();
+            if (!value) return true;
+            return /^(tbd|tbc|to be decided|to be confirmed|unknown|n\/a|-)$/.test(value)
+                || /winner|runner-up|runner up|loser|match \d+|group [a-l]|third place|third-place|play-?off|slot|placeholder/.test(value)
+                || /^[a-l][1234]$/.test(value);
+        }
+
+        function normalizeTeamName(name) {
+            if (isUnknownTeam(name)) return '???';
+            return getCleanString(name).toUpperCase();
+        }
+
+        function normalizeCountryKey(name) {
+            return getCleanString(name)
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/&/g, 'and')
+                .replace(/\./g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function normalizeFlagCode(code, teamName) {
+            let raw = getCleanString(code).toLowerCase().trim();
+            
+            // Map common 3-letter codes to their 2-letter equivalents
+            if (THREE_LETTER_CODES[raw]) {
+                raw = THREE_LETTER_CODES[raw];
+            }
+            
+            if (raw && raw !== 'tbd' && raw !== '???' && raw.length === 2) return raw;
+            if (isUnknownTeam(teamName)) return 'tbd';
+            
+            const key = normalizeCountryKey(teamName);
+            return COUNTRY_FLAG_CODES[key] || 'tbd';
+        }
+
+        function parseScoreValue(value) {
+            if (value === null || value === undefined || value === '') return null;
+            if (typeof value === 'number' && Number.isFinite(value)) return value;
+            const raw = getCleanString(value);
+            if (!raw || raw === '-') return null;
+            const parsed = Number(raw.replace(/[^0-9.-]/g, ''));
+            return Number.isFinite(parsed) ? parsed : null;
+        }
+
+        function parseMinuteValue(value) {
+            const raw = getCleanString(value);
+            if (!raw) return null;
+            const match = raw.match(/(\d{1,3})/);
+            if (!match) return null;
+            const minute = Number(match[1]);
+            return Number.isFinite(minute) ? minute : null;
+        }
+
+        function normalizeStatusValue(item) {
+            return getCleanString(pickFirst(item, [
+                'status', 'state', 'matchStatus', 'match_status', 'gameStatus', 'game_status',
+                'status.type.state', 'status.type.name', 'status.type.description', 'status.type.detail',
+                'status.description', 'status.detail', 'status.name', 'status.shortDetail'
+            ])).toLowerCase();
+        }
+
+        function flagHTML(code, teamName, sizeClass = 'text-sm') {
+            const finalCode = normalizeFlagCode(code, teamName);
+            if (finalCode === 'tbd') {
+                return `<span class="text-neutral-500 font-extrabold ${sizeClass} font-mono">?</span>`;
+            }
+            const safeCode = finalCode.replace(/[^a-z0-9-]/g, '');
+            const safeName = escapeHTML(getCleanString(teamName) || 'Team');
+            return `<img src="https://flagcdn.com/w320/${safeCode}.png" alt="${safeName} Flag" class="w-full h-full object-fill" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'text-neutral-500 font-extrabold ${sizeClass} font-mono',textContent:'?'}))">`;
+        }
+
+        function escapeHTML(value) {
+            return getCleanString(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function pickFirst(obj, keys) {
+            for (const key of keys) {
+                if (!obj) continue;
+                const value = key.split('.').reduce((acc, part) => acc && acc[part], obj);
+                if (value !== undefined && value !== null && String(value).trim?.() !== '') return value;
+            }
+            return '';
+        }
+
+        function normalizeStage(stage, group) {
+            const rawStage = getCleanString(stage);
+            const groupValue = getCleanString(group).replace(/^group\s+/i, '').toUpperCase();
+            const slug = rawStage.toLowerCase().replace(/_/g, '-');
+
+            if (groupValue && /^[A-L]$/.test(groupValue)) return `FIFA World Cup • Group ${groupValue}`;
+            if (slug.includes('group')) return 'FIFA World Cup • Group Stage';
+            if (slug.includes('round-of-32') || slug.includes('round of 32')) return 'FIFA World Cup • Round of 32';
+            if (slug.includes('round-of-16') || slug.includes('round of 16')) return 'FIFA World Cup • Round of 16';
+            if (slug.includes('quarter')) return 'FIFA World Cup • Quarter-Final';
+            if (slug.includes('semi')) return 'FIFA World Cup • Semi-Final';
+            if (slug.includes('third')) return 'FIFA World Cup • Third Place';
+            if (slug.includes('final')) return 'FIFA World Cup • World Cup Final';
+            if (rawStage) return rawStage.startsWith('FIFA') ? rawStage : `FIFA World Cup • ${rawStage}`;
+            return 'FIFA World Cup';
+        }
+
+        function normalizeKickoff(item) {
+            const direct = pickFirst(item, [
+                'kickoffUTC', 'kickoffUtc', 'kickoff_utc', 'utcKickoff', 'utc_kickoff', 'kickoff',
+                'kickoffTime', 'kickoff_time', 'dateTime', 'datetime', 'startTime', 'start_time',
+                'matchDate', 'match_date', 'gameDate', 'game_date', 'date'
+            ]);
+            const timeOnly = pickFirst(item, ['time', 'kickoffLocal', 'kickoff_local']);
+
+            if (direct) {
+                const raw = getCleanString(direct);
+                if (/^\d{4}-\d{2}-\d{2}$/.test(raw) && timeOnly) {
+                    const combined = `${raw}T${getCleanString(timeOnly).replace(/Z$/, '')}Z`;
+                    const parsedCombined = new Date(combined);
+                    if (!Number.isNaN(parsedCombined.getTime())) return parsedCombined.toISOString();
+                }
+                const parsed = new Date(raw);
+                if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+            }
+
+            const dateOnly = pickFirst(item, ['date', 'match_date', 'game_date']);
+            if (dateOnly) {
+                const parsed = new Date(`${getCleanString(dateOnly)}T00:00:00Z`);
+                if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+            }
+
+            return '';
+        }
+
+        function normalizeFixture(item, index = 0) {
+            const homeRaw = pickFirst(item, ['homeTeam', 'home_team', 'home.name', 'home.name_en', 'homeTeam.name', 'homeTeam.name_en', 'team1', 'team_a', 'teamA', 'home']);
+            const awayRaw = pickFirst(item, ['awayTeam', 'away_team', 'away.name', 'away.name_en', 'awayTeam.name', 'awayTeam.name_en', 'team2', 'team_b', 'teamB', 'away']);
+            const kickoffUTC = normalizeKickoff(item);
+            if (!kickoffUTC) return null;
+
+            const matchNumber = getCleanString(pickFirst(item, ['matchNumber', 'match_number', 'number', 'game_number', 'id', '_id'])) || String(index + 1);
+            const group = pickFirst(item, ['group', 'groupName', 'group_name', 'groups']);
+            const stage = normalizeStage(pickFirst(item, ['stage', 'round', 'roundName', 'round_name', 'phase', 'type']), group);
+            const venue = getCleanString(pickFirst(item, ['stadium', 'venue', 'location', 'stadium.name', 'stadium_name', 'place', 'venue.fullName'])) || '???';
+            const homeScore = parseScoreValue(pickFirst(item, ['homeScore', 'home_score', 'home.score', 'homeTeam.score', 'score.home', 'scores.home', 'homeGoals', 'home_goals']));
+            const awayScore = parseScoreValue(pickFirst(item, ['awayScore', 'away_score', 'away.score', 'awayTeam.score', 'score.away', 'scores.away', 'awayGoals', 'away_goals']));
+            const clockRaw = pickFirst(item, ['clockDisplay', 'clock_display', 'displayClock', 'status.displayClock', 'status.clock', 'minute', 'matchMinute', 'match_minute', 'elapsed', 'clock', 'timeElapsed']);
+            const minute = parseMinuteValue(clockRaw);
+            const status = normalizeStatusValue(item);
+
+            return {
+                id: `match-${matchNumber}`.replace(/[^a-zA-Z0-9_-]/g, '-'),
+                matchNumber,
+                stage,
+                homeTeam: getCleanString(homeRaw),
+                homeFlag: normalizeFlagCode(pickFirst(item, ['homeFlag', 'home_flag', 'home.code', 'home.fifa_code', 'homeTeam.code', 'homeTeam.fifa_code', 'homeTeamCode', 'home_team_code']), homeRaw),
+                awayTeam: getCleanString(awayRaw),
+                awayFlag: normalizeFlagCode(pickFirst(item, ['awayFlag', 'away_flag', 'away.code', 'away.fifa_code', 'awayTeam.code', 'awayTeam.fifa_code', 'awayTeamCode', 'away_team_code']), awayRaw),
+                kickoffUTC,
+                venue,
+                homeScore,
+                awayScore,
+                minute,
+                clockDisplay: getClockDisplay(clockRaw),
+                hasRealScore: homeScore !== null && awayScore !== null,
+                hasRealClock: !!getClockDisplay(clockRaw),
+                status
+            };
+        }
+
+        // Modified: A match is live if current time is equal or past the kickoff but not finished
+        function isLiveMatch(match, now = Date.now()) {
+            if (!match || isFinishedMatch(match, now)) return false;
+            const kickoff = new Date(match.kickoffUTC).getTime();
+            if (!Number.isFinite(kickoff)) return false;
+            return statusLooksLive(match.status) || now >= kickoff;
+        }
+
+        function getDisplayScore(value) {
+            const parsed = parseScoreValue(value);
+            return parsed === null ? '—' : String(parsed);
+        }
+
+        function formatLiveMinute(match) {
+            if (!match) return '';
+            if (match.clockDisplay) return match.clockDisplay;
+            if (statusLooksLive(match.status) && /half/.test(match.status || '')) return 'HT';
+            const minute = parseMinuteValue(match.minute);
+            return minute ? `${minute}'` : 'LIVE';
+        }
+
+        function selectSpotlightMatch(fixtures) {
+            const now = Date.now();
+            const visible = fixtures
+                .filter((match) => match && match.kickoffUTC && !isFinishedMatch(match, now))
+                .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+            const live = visible.filter((match) => isLiveMatch(match, now));
+            return live[0] || visible.find((match) => new Date(match.kickoffUTC).getTime() > now) || fixtures[0] || null;
+        }
+
+        function renderHeroFlag(elementId, match, side) {
+            const el = document.getElementById(elementId);
+            const teamName = side === 'home' ? match.homeTeam : match.awayTeam;
+            const flagCode = side === 'home' ? match.homeFlag : match.awayFlag;
+            if (!el) return;
+            el.innerHTML = flagHTML(flagCode, teamName, 'text-2xl');
+        }
+
+        function setHeroCenter(match) {
+            const center = document.getElementById('hero-center-badge');
+            const timer = document.getElementById('hero-timer');
+            const label = document.getElementById('hero-status-label');
+            if (!center || !timer || !label) return;
+
+            if (isLiveMatch(match)) {
+                const homeScore = getDisplayScore(match.homeScore);
+                const awayScore = getDisplayScore(match.awayScore);
+                const minute = formatLiveMinute(match);
+                label.innerText = 'LIVE';
+                timer.style.display = 'none';
+                center.classList.add('live-center-badge');
+                center.innerHTML = `
+                    <div class="hero-live-score flex flex-col items-center leading-none">
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <span class="text-2xl md:text-4xl font-black tracking-tight text-white">${escapeHTML(homeScore)}</span>
+                            <span class="text-xl md:text-3xl font-black tracking-tight hero-score-dash">-</span>
+                            <span class="text-2xl md:text-4xl font-black tracking-tight text-white">${escapeHTML(awayScore)}</span>
+                        </div>
+                        <span class="text-[12px] md:text-sm font-black text-red-500/80 uppercase tracking-widest mt-2">${escapeHTML(minute)}</span>
+                    </div>
+                `;
+            } else {
+                label.innerText = 'NEXT MATCH';
+                timer.style.display = 'flex';
+                center.classList.remove('live-center-badge');
+                center.innerHTML = '<span class="text-[11px] font-black tracking-widest text-neutral-500 uppercase">VS</span>';
+            }
+        }
+
+        function setHeroMatch(match) {
+            if (!match) return;
+
+            activeMatchObj = match;
+            heroMatchId = match.id;
+            heroKickoff = new Date(match.kickoffUTC);
+
+            document.getElementById('hero-home-name').innerText = normalizeTeamName(match.homeTeam);
+            document.getElementById('hero-away-name').innerText = normalizeTeamName(match.awayTeam);
+            document.getElementById('hero-stage').innerText = match.stage || 'FIFA World Cup';
+            document.getElementById('hero-date').innerText = heroKickoff.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('hero-time').innerText = heroKickoff.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) + ' ' + heroKickoff.toLocaleTimeString(undefined, { timeZoneName: 'short' }).split(' ').pop();
+            document.getElementById('hero-venue').innerText = match.venue || '???';
+
+            renderHeroFlag('hero-home-flag', match, 'home');
+            renderHeroFlag('hero-away-flag', match, 'away');
+            setHeroCenter(match);
+            runMainCountdown();
+        }
+
+        function applySchedule(fixtures) {
+            matchesData = fixtures
+                .filter((match) => match && match.kickoffUTC)
+                .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+
+            const heroMatch = selectSpotlightMatch(matchesData);
+            if (heroMatch) setHeroMatch(heroMatch);
+            renderTimeline();
+        }
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, {
+            threshold: 0.12,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        function renderTimeline() {
+            scheduleContainer.innerHTML = '';
+
+            const now = Date.now();
+            const upcomingMatches = matchesData
+                .filter((match) => match.id !== heroMatchId)
+                .filter((match) => !isFinishedMatch(match, now))
+                .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+
+            upcomingMatches.forEach((match) => {
+                const dateUTC = new Date(match.kickoffUTC);
+                const sameDay = dateUTC.toDateString() === new Date().toDateString();
+                const live = isLiveMatch(match, now);
+
+                let matchTimeHTML = '';
+                if (live) {
+                    matchTimeHTML = `
+                        <div class="flex items-center gap-1.5 font-bold text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+                            <span class="w-1 h-1 bg-red-500 rounded-full animate-pulse"></span>
+                            <span class="text-[10px] font-black tracking-widest">LIVE</span>
+                            <span class="text-xs font-mono tracking-wider text-red-500/80">${escapeHTML(formatLiveMinute(match))}</span>
+                        </div>
+                    `;
+                } else if (sameDay && dateUTC.getTime() > now) {
+                    matchTimeHTML = `
+                        <div class="flex items-center gap-1.5 font-bold text-red-500 animate-pulse bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+                            <span id="countdown-ticker-${escapeHTML(match.id)}" class="text-[10px] font-mono tracking-wider">00:00:00</span>
+                        </div>
+                    `;
+                } else {
+                    matchTimeHTML = `
+                        <span class="text-[10px] font-semibold text-neutral-400 select-none uppercase tracking-widest">
+                            ${escapeHTML(formatMatchDate(dateUTC))}
+                        </span>
+                    `;
+                }
+
+                const centerHTML = live
+                    ? `<div class="flex flex-col items-center leading-none">
+                            <div class="flex items-center gap-1.5 md:gap-2">
+                                <span class="text-base md:text-lg font-black text-white">${escapeHTML(getDisplayScore(match.homeScore))}</span>
+                                <span class="text-sm md:text-base font-black hero-score-dash">-</span>
+                                <span class="text-base md:text-lg font-black text-white">${escapeHTML(getDisplayScore(match.awayScore))}</span>
+                            </div>
+                            <span class="text-[10px] md:text-xs font-black text-red-500/70 mt-1 tracking-wider">${escapeHTML(formatLiveMinute(match))}</span>
+                        </div>`
+                    : '<span class="text-[9px] font-black tracking-widest text-neutral-600 uppercase">VS</span>';
+
+                const item = document.createElement('div');
+                item.id = match.id;
+                item.className = 'future-match reveal-item w-full flex flex-col items-center text-center py-1';
+
+                item.innerHTML = `
+                    <!-- Match Metadata Details Block -->
+                    <div class="flex flex-col items-center gap-2 mb-5">
+                        <span class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-[0.25em]">${escapeHTML(match.stage)}</span>
+                        <div class="flex flex-col md:flex-row items-center gap-2 md:gap-3 text-[10px] text-neutral-600 font-medium">
+                            ${matchTimeHTML}
+                            <span class="hidden md:inline text-neutral-800">•</span>
+                            <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3 text-neutral-700"></i> ${escapeHTML(match.venue)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Teams Row -->
+                    <div class="relative flex justify-center items-start w-full max-w-lg px-4">
+                        <!-- Left Side: Home Team -->
+                        <div class="flex flex-col items-center w-1/2 pr-3 md:pr-4">
+                            <div class="w-20 md:w-28 aspect-[3/2] shadow-[0_15px_30px_rgba(0,0,0,0.85)] border border-white/10 overflow-hidden flex items-center justify-center bg-neutral-950">
+                                ${flagHTML(match.homeFlag, match.homeTeam)}
+                            </div>
+                            <h3 class="text-[11px] md:text-sm font-extrabold tracking-wide text-neutral-300 uppercase select-none mt-3 whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                                ${escapeHTML(normalizeTeamName(match.homeTeam))}
+                            </h3>
+                        </div>
+
+                        <!-- Splitter VS / Live Score -->
+                        <div class="absolute left-1/2 top-[28px] md:top-[38px] -translate-x-1/2 -translate-y-1/2 z-10 select-none px-2 py-0.5">
+                            ${centerHTML}
+                        </div>
+
+                        <!-- Right Side: Away Team -->
+                        <div class="flex flex-col items-center w-1/2 pl-3 md:pl-4">
+                            <div class="w-20 md:w-28 aspect-[3/2] shadow-[0_15px_30px_rgba(0,0,0,0.85)] border border-white/10 overflow-hidden flex items-center justify-center bg-neutral-950">
+                                ${flagHTML(match.awayFlag, match.awayTeam)}
+                            </div>
+                            <h3 class="text-[11px] md:text-sm font-extrabold tracking-wide text-neutral-300 uppercase select-none mt-3 whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                                ${escapeHTML(normalizeTeamName(match.awayTeam))}
+                            </h3>
+                        </div>
+                    </div>
+                `;
+
+                scheduleContainer.appendChild(item);
+                scrollObserver.observe(item);
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function updateTimerElement(id, value, isDimmed) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            el.innerText = value;
+            el.className = isDimmed
+                ? 'text-3xl md:text-4xl font-black text-neutral-500 tracking-tight leading-none transition-all duration-300'
+                : 'text-4xl md:text-5xl font-black text-white tracking-tight leading-none transition-all duration-300';
+        }
+
+        function runMainCountdown() {
+            if (!heroKickoff) return;
+
+            const heroMatch = matchesData.find((match) => match.id === heroMatchId);
+            if (heroMatch && isLiveMatch(heroMatch)) return;
+
+            const now = Date.now();
+            let delta = Math.floor((heroKickoff.getTime() - now) / 1000);
+
+            if (delta <= 0) {
+                updateTimerElement('days', '00', true);
+                updateTimerElement('hours', '00', true);
+                updateTimerElement('minutes', '00', true);
+                updateTimerElement('seconds', '00', true);
+                if (heroMatch) setHeroCenter(heroMatch);
+                return;
+            }
+
+            const days = Math.floor(delta / 86400);
+            const hrs = Math.floor((delta % 86400) / 3600);
+            const mins = Math.floor((delta % 3600) / 60);
+            const secs = delta % 60;
+
+            updateTimerElement('days', String(days).padStart(2, '0'), days === 0);
+            updateTimerElement('hours', String(hrs).padStart(2, '0'), delta < 3600);
+            updateTimerElement('minutes', String(mins).padStart(2, '0'), delta < 60);
+            updateTimerElement('seconds', String(secs).padStart(2, '0'), delta <= 0);
+        }
+
+        function runSecondaryTickers() {
+            const now = Date.now();
+            matchesData.forEach(match => {
+                const el = document.getElementById(`countdown-ticker-${match.id}`);
+                if (!el) return;
+
+                const kickoff = new Date(match.kickoffUTC);
+                let delta = Math.floor((kickoff.getTime() - now) / 1000);
+
+                if (delta <= 0) {
+                    el.innerText = '00:00:00';
+                    return;
+                }
+
+                const hrs = Math.floor((delta % 86400) / 3600);
+                const mins = Math.floor((delta % 3600) / 60);
+                const secs = delta % 60;
+
+                el.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            });
+        }
+
+        function globalClockTick() {
+            if (matchesData.length) {
+                const currentHero = matchesData.find((match) => match.id === heroMatchId);
+                if (currentHero) {
+                    if (isFinishedMatch(currentHero)) {
+                        // Match finished, dynamically target the next spotlight game
+                        const nextHero = selectSpotlightMatch(matchesData);
+                        if (nextHero && nextHero.id !== heroMatchId) {
+                            setHeroMatch(nextHero);
+                        }
+                    } else {
+                        setHeroCenter(currentHero);
+                    }
+                }
+            }
+
+            runMainCountdown();
+            runSecondaryTickers();
+        }
+
+        // ================= STREAM ENGINE ACTIONS & ROUTER =================
+
+        // Builds custom trigger display matching the image style: Language | Live Feed (Red Quality Badge)
+        function makeTriggerDisplayHTML(chan) {
+            return `
+                <span class="text-white text-xs md:text-sm font-black tracking-wide uppercase whitespace-nowrap select-none">
+                    ${escapeHTML(chan.lang)} | ${escapeHTML(chan.channel)}
+                </span>
+                <span class="bg-red-600 text-white text-[9px] md:text-[10px] px-1.5 py-0.5 rounded font-black tracking-widest leading-none shrink-0 select-none">
+                    ${escapeHTML(chan.quality)}
+                </span>
+            `;
+        }
+
+        // Option Row Builder for inside the list panel
+        function makeServerOptionHTML(chan) {
+            return `
+                <div class="flex items-center justify-between gap-3 w-full text-left font-bold select-none">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="text-white text-xs font-bold shrink-0">${escapeHTML(chan.lang)}</span>
+                        <span class="text-neutral-500 font-medium shrink-0">|</span>
+                        <span class="text-neutral-400 font-semibold text-xs truncate">${escapeHTML(chan.channel)}</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] font-black bg-red-600 text-white px-1.5 py-0.5 rounded uppercase tracking-wider">${escapeHTML(chan.quality)}</span>
+                        <span class="text-[10px] text-neutral-500 font-medium lowercase">${escapeHTML(chan.viewers)} viewers</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateCustomDropdown() {
+            dropdownOptions.innerHTML = '';
+            SERVER_CHANNELS.forEach(chan => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left px-4 py-2.5 hover:bg-white/5 active:bg-white/10 transition-colors flex items-center justify-between gap-2 border-b border-white/5 last:border-b-0";
+                btn.innerHTML = makeServerOptionHTML(chan);
+                
+                btn.addEventListener('click', () => {
+                    selectServer(chan);
+                    toggleDropdown(false);
+                });
+                
+                dropdownOptions.appendChild(btn);
+            });
+        }
+
+        function selectServer(chan) {
+            if (!activeMatchObj) return;
+
+            const homeSlug = normalizeCountryKey(activeMatchObj.homeTeam).replace(/\s+/g, '-');
+            const awaySlug = normalizeCountryKey(activeMatchObj.awayTeam).replace(/\s+/g, '-');
+
+            let finalURL = "";
+            if (chan.type === "admin") {
+                // Arabic beIN, French TF1, German ZDF etc.
+                finalURL = `${STREAM_BASE_URL_ADMIN}${homeSlug}-vs-${awaySlug}/${chan.server}`;
+            } else {
+                // original English feeds (uses exact delta parameters for the primary game)
+                const isDefaultMatch = (homeSlug.includes("united-states") || homeSlug.includes("usa")) && awaySlug.includes("australia");
+                if (isDefaultMatch) {
+                    finalURL = `${STREAM_BASE_URL_DELTA}${chan.server}`;
+                } else {
+                    finalURL = `${STREAM_BASE_URL_ADMIN}${homeSlug}-vs-${awaySlug}/${chan.server}`;
+                }
+            }
+
+            // Set source safely
+            videoFrame.src = finalURL;
+            
+            // Re-render trigger display
+            currentActiveSelection.innerHTML = makeTriggerDisplayHTML(chan);
+
+            // Update viewer count
+            streamViewersCount.innerText = chan.viewers;
+        }
+
+        // Animate the dropdown opening smoothly
+        function toggleDropdown(show) {
+            if (show) {
+                dropdownOptions.classList.remove('hidden');
+                dropdownChevron.classList.add('rotate-180');
+                
+                // Allow browser to render layout first, then apply animations
+                requestAnimationFrame(() => {
+                    dropdownOptions.classList.remove('opacity-0', 'scale-95', 'translate-y-2');
+                    dropdownOptions.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                });
+            } else {
+                dropdownChevron.classList.remove('rotate-180');
+                dropdownOptions.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                dropdownOptions.classList.add('opacity-0', 'scale-95', 'translate-y-2');
+                
+                // Set hidden after the animation ends
+                setTimeout(() => {
+                    if (dropdownOptions.classList.contains('opacity-0')) {
+                        dropdownOptions.classList.add('hidden');
+                    }
+                }, 150);
+            }
+        }
+
+        // Click handler with explicit toggles
+        dropdownTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !dropdownOptions.classList.contains('hidden') && dropdownOptions.classList.contains('opacity-100');
+            toggleDropdown(!isOpen);
+        });
+
+        // Close on escape or when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdownContainer.contains(e.target)) {
+                toggleDropdown(false);
+            }
+        });
+
+        function enterStreamingTheater() {
+            if (!activeMatchObj) return;
+
+            // Setup dynamic options
+            populateCustomDropdown();
+
+            // Setup matchup title at the top header
+            const home = normalizeTeamName(activeMatchObj.homeTeam);
+            const away = normalizeTeamName(activeMatchObj.awayTeam);
+            streamMatchTitle.innerText = `${home} VS ${away}`;
+
+            // Default to English Live Feed (HD) (Server 1)
+            const defaultChan = SERVER_CHANNELS[0];
+            selectServer(defaultChan);
+
+            // View transitions
+            mainLobby.classList.add('hidden');
+            streamTheater.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function exitStreamingTheater() {
+            // Cut Iframe memory leak
+            videoFrame.src = "about:blank";
+
+            streamTheater.classList.add('hidden');
+            mainLobby.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Parse schedules with robust try-catch blocks
+        function parseStatsApiFixtures(payload) {
+            const data = getJsonPayload(payload);
+            const list = Array.isArray(data) ? data : (data.fixtures || data.data || data.matches || []);
+            return list.map(normalizeFixture).filter(Boolean);
+        }
+
+        function parseGenericJsonFixtures(payload) {
+            const data = getJsonPayload(payload);
+            const list = Array.isArray(data) ? data : (data.fixtures || data.data || data.matches || data.games || data.items || data.results || []);
+            return list.map(normalizeFixture).filter(Boolean);
+        }
+
+        function parseGenericCsvFixtures(text) {
+            const rows = parseCsv(text);
+            if (rows.length < 2) return [];
+            const headers = rows[0].map((header) => header.trim().replace(/\s+/g, '_'));
+            const objects = rows.slice(1).map((row) => {
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header] = row[index] || '';
+                });
+                return item;
+            });
+            return objects.map(normalizeFixture).filter(Boolean);
+        }
+
+        function parseCsv(text) {
+            const rows = [];
+            let cell = '';
+            let row = [];
+            let quoted = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const next = text[i + 1];
+
+                if (char === '"' && quoted && next === '"') {
+                    cell += '"';
+                    i++;
+                } else if (char === '"') {
+                    quoted = !quoted;
+                } else if (char === ',' && !quoted) {
+                    row.push(cell);
+                    cell = '';
+                } else if ((char === '\n' || char === '\r') && !quoted) {
+                    if (char === '\r' && next === '\n') i++;
+                    row.push(cell);
+                    if (row.some((value) => value.trim() !== '')) rows.push(row);
+                    cell = '';
+                    row = [];
+                } else {
+                    cell += char;
+                }
+            }
+
+            if (cell || row.length) {
+                row.push(cell);
+                if (row.some((value) => value.trim() !== '')) rows.push(row);
+            }
+
+            return rows;
+        }
+
+        function parseEspnScoreboard(payload) {
+            const data = getJsonPayload(payload);
+            const events = Array.isArray(data.events) ? data.events : [];
+            return events.map((event, index) => {
+                const competition = event.competitions?.[0] || {};
+                const competitors = Array.isArray(competition.competitors) ? competition.competitors : [];
+                const home = competitors.find((team) => team.homeAway === 'home') || competitors[0] || {};
+                const away = competitors.find((team) => team.homeAway === 'away') || competitors[1] || {};
+                const homeTeam = home.team?.displayName || home.team?.name || home.team?.shortDisplayName || home.team?.abbreviation || '';
+                const awayTeam = away.team?.displayName || away.team?.name || away.team?.shortDisplayName || away.team?.abbreviation || '';
+                const statusType = event.status?.type || {};
+                const clockDisplay = getClockDisplay(event.status?.displayClock || statusType.detail || statusType.shortDetail);
+                const rawStatus = [statusType.state, statusType.name, statusType.description, statusType.detail, statusType.shortDetail, event.status?.displayClock].filter(Boolean).join(' ');
+                const venue = competition.venue?.fullName || competition.venue?.address?.city || event.venue?.fullName || '???';
+                const groupName = event.group?.shortName || event.group?.name || event.league?.name || '';
+
+                return {
+                    id: `espn-${event.id || index}`,
+                    matchNumber: event.id || `espn-${index + 1}`,
+                    stage: normalizeStage(groupName || event.season?.slug || 'FIFA World Cup', groupName),
+                    homeTeam,
+                    homeFlag: normalizeFlagCode(home.team?.abbreviation || home.team?.countryFlag?.split('/').pop()?.split('.')[0], homeTeam),
+                    awayTeam,
+                    awayFlag: normalizeFlagCode(away.team?.abbreviation || away.team?.countryFlag?.split('/').pop()?.split('.')[0], awayTeam),
+                    kickoffUTC: event.date ? new Date(event.date).toISOString() : '',
+                    venue,
+                    homeScore: parseScoreValue(home.score),
+                    awayScore: parseScoreValue(away.score),
+                    minute: parseMinuteValue(event.status?.displayClock || statusType.detail || statusType.shortDetail),
+                    clockDisplay,
+                    hasRealScore: parseScoreValue(home.score) !== null && parseScoreValue(away.score) !== null,
+                    hasRealClock: !!clockDisplay,
+                    liveSource: 'espn-scoreboard',
+                    status: rawStatus.toLowerCase()
+                };
+            }).filter((match) => match.kickoffUTC);
+        }
+
+        async function fetchEspnScoreboards() {
+            const today = new Date();
+            const dates = [-1, 0, 1, 2].map((offset) => {
+                const day = new Date(today);
+                day.setDate(today.getDate() + offset);
+                return formatEspnDate(day);
+            });
+            const urls = dates.map((date) => `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${date}&limit=100`);
+            const results = await Promise.allSettled(urls.map((url) => fetchWithTimeout(url, 6500)));
+            return results.flatMap((result) => result.status === 'fulfilled' ? parseEspnScoreboard(result.value) : []);
+        }
+
+        async function fetchLiveFixtures() {
+            const all = [];
+            for (const source of LIVE_SCORE_SOURCES) {
+                try {
+                    const fixtures = source.loader
+                        ? await source.loader()
+                        : source.parser(await fetchWithTimeout(source.url, 6500));
+                    if (Array.isArray(fixtures) && fixtures.length) {
+                        all.push(...fixtures.map((match) => ({ ...match, liveSource: match.liveSource || source.name })));
+                    }
+                } catch (error) {
+                    // Silent fallback
+                }
+            }
+            return all.filter((match) => match && match.kickoffUTC);
+        }
+
+        function isFinishedMatch(match, now = Date.now()) {
+            if (!match || !match.kickoffUTC) return true;
+            if (statusLooksFinished(match.status)) return true;
+            const kickoff = new Date(match.kickoffUTC).getTime();
+            if (!Number.isFinite(kickoff)) return true;
+            return now > kickoff + fallbackMatchDurationMs(match);
+        }
+
+
+
+        // ===== REQUIRED HELPERS THAT WERE MISSING =====
+        // Your page was stopping here because refreshLiveData() did not exist.
+        function statusLooksLive(status) {
+            const raw = getCleanString(status).toLowerCase();
+            if (!raw) return false;
+            return /\b(live|in|in progress|first half|second half|1st half|2nd half|halftime|half time|ht|extra time|penalties?)\b/.test(raw)
+                && !statusLooksFinished(raw);
+        }
+
+        function statusLooksFinished(status) {
+            const raw = getCleanString(status).toLowerCase();
+            if (!raw) return false;
+            return /\b(ft|full time|full-time|final|finished|ended|complete|completed|post|postponed|cancelled|canceled|abandoned)\b/.test(raw);
+        }
+
+        function fallbackMatchDurationMs(match) {
+            const stage = getCleanString(match?.stage).toLowerCase();
+            return /(round|quarter|semi|final|knockout|third)/.test(stage)
+                ? KNOCKOUT_FALLBACK_MS
+                : GROUP_STAGE_FALLBACK_MS;
+        }
+
+        function formatEspnDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}${m}${d}`;
+        }
+
+        function formatMatchDate(date) {
+            return date.toLocaleString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        async function fetchWithTimeout(url, timeoutMs = 10000) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, {
+                    signal: controller.signal,
+                    cache: 'no-store',
+                    mode: 'cors'
+                });
+                if (!res.ok) throw new Error(`Fetch failed ${res.status}: ${url}`);
+                return await res.text();
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        function teamKey(name) {
+            return normalizeCountryKey(name)
+                .replace(/^(the\s+)/, '')
+                .replace(/united states of america|united states|usa/g, 'us')
+                .replace(/cote divoire|côte divoire|ivory coast/g, 'ivory-coast')
+                .replace(/\s+/g, '-');
+        }
+
+        function sameTeams(a, b) {
+            const ah = teamKey(a.homeTeam);
+            const aa = teamKey(a.awayTeam);
+            const bh = teamKey(b.homeTeam);
+            const ba = teamKey(b.awayTeam);
+            return (ah && aa && ah === bh && aa === ba) || (ah && aa && ah === ba && aa === bh);
+        }
+
+        function closeKickoff(a, b, maxDiffMs = 36 * 60 * 60 * 1000) {
+            const at = new Date(a.kickoffUTC).getTime();
+            const bt = new Date(b.kickoffUTC).getTime();
+            if (!Number.isFinite(at) || !Number.isFinite(bt)) return false;
+            return Math.abs(at - bt) <= maxDiffMs;
+        }
+
+        function mergeLiveIntoBase(base, live) {
+            if (!Array.isArray(live) || !live.length) return base;
+            const merged = base.map((baseMatch) => {
+                const liveMatch = live.find((item) => sameTeams(baseMatch, item) && closeKickoff(baseMatch, item));
+                if (!liveMatch) return baseMatch;
+                return {
+                    ...baseMatch,
+                    homeScore: liveMatch.homeScore ?? baseMatch.homeScore,
+                    awayScore: liveMatch.awayScore ?? baseMatch.awayScore,
+                    minute: liveMatch.minute ?? baseMatch.minute,
+                    clockDisplay: liveMatch.clockDisplay || baseMatch.clockDisplay,
+                    hasRealScore: liveMatch.hasRealScore || baseMatch.hasRealScore,
+                    hasRealClock: liveMatch.hasRealClock || baseMatch.hasRealClock,
+                    status: liveMatch.status || baseMatch.status,
+                    liveSource: liveMatch.liveSource || baseMatch.liveSource
+                };
+            });
+
+            // Keep live-only games if an API returns one missing from the base schedule.
+            live.forEach((liveMatch) => {
+                const alreadyExists = merged.some((baseMatch) => sameTeams(baseMatch, liveMatch) && closeKickoff(baseMatch, liveMatch));
+                if (!alreadyExists) merged.push(liveMatch);
+            });
+
+            return merged;
+        }
+
+        async function refreshLiveData() {
+            const safeBase = Array.isArray(baseFixtures) && baseFixtures.length ? baseFixtures : MOCK_FIXTURES;
+            let liveFixtures = [];
+            try {
+                liveFixtures = await fetchLiveFixtures();
+            } catch (error) {
+                liveFixtures = [];
+            }
+
+            const merged = mergeLiveIntoBase(safeBase, liveFixtures);
+            applySchedule(merged.length ? merged : safeBase);
+        }
+
+        function startLiveRefresh() {
+            if (liveRefreshStarted) return;
+            liveRefreshStarted = true;
+            setInterval(refreshLiveData, LIVE_REFRESH_MS);
+        }
+
+        async function fetchLiveWorldCupSchedule() {
+            let success = false;
+            for (const source of REAL_SCHEDULE_SOURCES) {
+                try {
+                    const payload = await fetchWithTimeout(source.url);
+                    const fixtures = source.parser(payload)
+                        .filter((match) => match && match.kickoffUTC)
+                        .sort((a, b) => new Date(a.kickoffUTC) - new Date(b.kickoffUTC));
+
+                    if (fixtures.length > 0) {
+                        baseFixtures = fixtures;
+                        success = true;
+                        break;
+                    }
+                } catch (error) {
+                    // Silent fallback
+                }
+            }
+
+            // Fallback securely to Mock matches if network requests are blocked by CORS/offline
+            if (!success || baseFixtures.length === 0) {
+                baseFixtures = MOCK_FIXTURES;
+            }
+
+            await refreshLiveData();
+            startLiveRefresh();
+        }
+
+        // Action Bindings
+        watchLiveBtn.addEventListener('click', enterStreamingTheater);
+        streamBackBtn.addEventListener('click', exitStreamingTheater);
+
+        setInterval(globalClockTick, 1000);
+        globalClockTick();
+        fetchLiveWorldCupSchedule();
+    </script>
+</body>
+</html>
